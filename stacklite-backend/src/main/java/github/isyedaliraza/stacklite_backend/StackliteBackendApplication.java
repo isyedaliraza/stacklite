@@ -46,11 +46,13 @@ public class StackliteBackendApplication implements CommandLineRunner {
 		q1.setTitle("How to use Spring Boot?");
 		q1.setBody("I want to create a REST API with Spring Boot. How do I start?");
 		q1.setTags(Arrays.asList(javaTag, springTag));
+		q1.setAnswered(true);
 
 		Question q2 = new Question();
 		q2.setTitle("Java Streams Example");
 		q2.setBody("How do I use Streams in Java 17?");
 		q2.setTags(Arrays.asList(javaTag));
+		q2.setAnswered(true);
 
 		questionRepository.saveAll(Arrays.asList(q1, q2));
 
