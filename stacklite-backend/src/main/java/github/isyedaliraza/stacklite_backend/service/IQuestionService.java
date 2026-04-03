@@ -6,7 +6,9 @@ import github.isyedaliraza.stacklite_backend.domain.model.WriteQuestionDTO;
 import github.isyedaliraza.stacklite_backend.domain.repository.QuestionRepository;
 import github.isyedaliraza.stacklite_backend.domain.repository.TagRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,10 +50,16 @@ public class IQuestionService implements QuestionService {
         question.setTitle(writeQuestionDTO.getTitle());
         question.setBody(writeQuestionDTO.getBody());
 
-        String tagId = writeQuestionDTO.getTagId();
-        if (tagId != null) {
-            Tag tag = tagRepository.findById(tagId).orElseThrow();
-            question.setTags(List.of(tag));
+        ArrayList<String> tagIds = writeQuestionDTO.getTags();
+
+        if (!tagIds.isEmpty()) {
+            List<Tag> tags = new ArrayList<>();
+            for (Tag tag: tagRepository.findAll()) {
+                if (tagIds.contains(tag.getId())) {
+                    tags.add(tag);
+                }
+            }
+            question.setTags(tags);
         }
 
         return questionRepository.save(question);
@@ -68,6 +76,7 @@ public class IQuestionService implements QuestionService {
 
         String title = writeQuestionDTO.getTitle();
         String body = writeQuestionDTO.getBody();
+        ArrayList<String> tagIds = writeQuestionDTO.getTags();
 
         if (title != null) {
             question.setTitle(title);
@@ -75,6 +84,16 @@ public class IQuestionService implements QuestionService {
 
         if (body != null) {
             question.setBody(body);
+        }
+
+        if (!tagIds.isEmpty()) {
+            List<Tag> tags = new ArrayList<>();
+            for (Tag tag: tagRepository.findAll()) {
+                if (tagIds.contains(tag.getId())) {
+                    tags.add(tag);
+                }
+            }
+            question.setTags(tags);
         }
 
         return questionRepository.save(question);
@@ -87,7 +106,7 @@ public class IQuestionService implements QuestionService {
 
     @Override
     public List<Question> findAllByTagsName(String name) {
-        return questionRepository.findAllByTagsName(name);
+        return questionRepository.findAllByTags_Name(name);
     }
 
     @Override
@@ -115,6 +134,7 @@ public class IQuestionService implements QuestionService {
     }
 
     @Override
+    @Transactional
     public Question resolveQuestion(String questionId) {
         Question question = questionRepository.findById(questionId).orElseThrow();
 
